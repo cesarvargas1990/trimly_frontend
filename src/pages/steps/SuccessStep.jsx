@@ -1,4 +1,4 @@
-import { Check, CalendarDays, Clock, Hash, Scissors, Timer, UserRound, Phone } from 'lucide-react';
+import { Check, CalendarDays, Clock, Hash, Scissors, UserRound, Phone } from 'lucide-react';
 import PrimaryButton from '../../components/PrimaryButton.jsx';
 import { formatLongDate } from '../../utils/dates.js';
 
@@ -21,7 +21,6 @@ export default function SuccessStep({ citaConfirmada, onRestart }) {
         <SummaryItem icon={Scissors} label="Barbero" value={cita.barbero} />
         <SummaryItem icon={CalendarDays} label="Fecha" value={formatDate(cita.fecha)} />
         <SummaryItem icon={Clock} label="Hora" value={cita.hora} />
-        {cita.duracion ? <SummaryItem icon={Timer} label="Duración" value={`${cita.duracion} min`} /> : null}
       </div>
 
       <p className="telegram-note">Te enviaremos los detalles de tu cita por Telegram.</p>
