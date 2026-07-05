@@ -19,6 +19,7 @@ import RegisterStep from './steps/RegisterStep.jsx';
 import SuccessStep from './steps/SuccessStep.jsx';
 import TimeSlotsStep from './steps/TimeSlotsStep.jsx';
 import WelcomeStep from './steps/WelcomeStep.jsx';
+import { normalizeTimeForApi } from '../utils/time.js';
 
 const initialBooking = {
   empresa: null,
@@ -41,9 +42,17 @@ const friendlyErrors = {
   register: 'No pudimos completar tu registro. Revisa tus datos e intenta de nuevo.',
   dates: 'No pudimos cargar las fechas disponibles.',
   hours: 'No pudimos cargar los horarios disponibles.',
-  preconfirm: 'La hora seleccionada ya no está disponible. Elige otro horario.',
+  preconfirm: 'No pudimos validar este horario. Intenta nuevamente o elige otro.',
   confirm: 'No pudimos confirmar la cita. Intenta nuevamente.',
 };
+
+function getFriendlyError(error, fallback) {
+  if (error?.message && error.message !== 'No pudimos completar la solicitud.') {
+    return error.message;
+  }
+
+  return fallback;
+}
 
 export default function TrimlyBooking() {
   const { publicToken } = useParams();
@@ -206,7 +215,7 @@ export default function TrimlyBooking() {
       const data = await preconfirmarCita({
         bookingSession: state.bookingSession,
         fecha: state.fechaSeleccionada,
-        hora: state.horaSeleccionada.value,
+        hora: normalizeTimeForApi(state.horaSeleccionada),
         publicToken,
       });
 
@@ -215,12 +224,12 @@ export default function TrimlyBooking() {
         preconfirmacion: data || {},
       }));
       setStep('preconfirm');
-    } catch {
+    } catch (requestError) {
       setState((current) => ({
         ...current,
         horaSeleccionada: null,
       }));
-      setError(friendlyErrors.preconfirm);
+      setError(getFriendlyError(requestError, friendlyErrors.preconfirm));
     } finally {
       setLoading(false);
     }
@@ -234,7 +243,7 @@ export default function TrimlyBooking() {
       const data = await confirmarCita({
         bookingSession: state.bookingSession,
         fecha: state.fechaSeleccionada,
-        hora: state.horaSeleccionada.value,
+        hora: normalizeTimeForApi(state.horaSeleccionada),
         publicToken,
       });
 

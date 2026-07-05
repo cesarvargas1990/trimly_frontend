@@ -39,10 +39,22 @@ async function request(path, options = {}) {
   }
 
   if (!response.ok) {
-    throw new ApiError(data?.message || 'No pudimos completar la solicitud.', response.status);
+    throw new ApiError(getErrorMessage(data) || 'No pudimos completar la solicitud.', response.status);
   }
 
   return data;
+}
+
+function getErrorMessage(data) {
+  if (data?.message) return data.message;
+  if (typeof data?.detail === 'string') return data.detail;
+  if (Array.isArray(data?.detail)) {
+    return data.detail
+      .map((item) => item?.msg || item?.message)
+      .filter(Boolean)
+      .join(' ');
+  }
+  return '';
 }
 
 function withPublicToken(path, publicToken) {
