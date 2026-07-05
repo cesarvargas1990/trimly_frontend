@@ -350,7 +350,12 @@ export default function TrimlyBooking() {
       ) : null}
 
       {step === 'success' ? (
-        <SuccessStep citaConfirmada={state.citaConfirmada} onRestart={restart} />
+        <SuccessStep
+          citaConfirmada={state.citaConfirmada}
+          empresa={state.empresa}
+          barbero={state.barbero}
+          onRestart={restart}
+        />
       ) : null}
     </LayoutMobile>
   );
