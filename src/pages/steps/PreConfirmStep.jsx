@@ -1,4 +1,4 @@
-import { CalendarDays, Clock, Scissors, Timer, UserRound } from 'lucide-react';
+import { CalendarDays, Clock, Scissors, UserRound } from 'lucide-react';
 import AlertMessage from '../../components/AlertMessage.jsx';
 import PrimaryButton from '../../components/PrimaryButton.jsx';
 import StepHeader from '../../components/StepHeader.jsx';
@@ -16,8 +16,6 @@ export default function PreConfirmStep({
   loading,
   error,
 }) {
-  const duration = preconfirmacion?.duracion || preconfirmacion?.cita?.duracion;
-
   return (
     <div className="step-card">
       <StepHeader
@@ -32,7 +30,6 @@ export default function PreConfirmStep({
         <SummaryItem icon={UserRound} label="Barbero" value={barbero?.nombre || 'Asignado'} />
         <SummaryItem icon={CalendarDays} label="Fecha" value={formatLongDate(fecha)} />
         <SummaryItem icon={Clock} label="Hora" value={hora?.label} />
-        {duration ? <SummaryItem icon={Timer} label="Duración" value={`${duration} min`} /> : null}
       </div>
 
       <AlertMessage type="error" message={error} />
