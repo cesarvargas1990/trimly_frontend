@@ -19,6 +19,7 @@ import RegisterStep from './steps/RegisterStep.jsx';
 import SuccessStep from './steps/SuccessStep.jsx';
 import TimeSlotsStep from './steps/TimeSlotsStep.jsx';
 import WelcomeStep from './steps/WelcomeStep.jsx';
+import { isPastDateKey } from '../utils/dates.js';
 import { normalizeTimeForApi } from '../utils/time.js';
 
 const initialBooking = {
@@ -45,6 +46,22 @@ const friendlyErrors = {
   preconfirm: 'No pudimos validar este horario. Intenta nuevamente o elige otro.',
   confirm: 'No pudimos confirmar la cita. Intenta nuevamente.',
 };
+
+async function filterDatesWithAvailability({ fechas, publicToken }) {
+  const futureDates = fechas.filter((fecha) => !isPastDateKey(fecha));
+  const results = await Promise.all(
+    futureDates.map(async (fecha) => {
+      try {
+        const data = await getDisponibilidad({ fecha, publicToken });
+        return Array.isArray(data?.horas) && data.horas.length > 0 ? fecha : null;
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  return results.filter(Boolean);
+}
 
 function getFriendlyError(error, fallback) {
   if (error?.message && error.message !== 'No pudimos completar la solicitud.') {
@@ -110,9 +127,15 @@ export default function TrimlyBooking() {
 
     try {
       const data = await getFechasDisponibles(publicToken);
+      const fechas = Array.isArray(data?.fechas) ? data.fechas : [];
+      const fechasConHorarios = await filterDatesWithAvailability({ fechas, publicToken });
+
       setState((current) => ({
         ...current,
-        fechasDisponibles: Array.isArray(data?.fechas) ? data.fechas : [],
+        fechasDisponibles: fechasConHorarios,
+        fechaSeleccionada: '',
+        horaSeleccionada: null,
+        horasDisponibles: [],
       }));
       setStep(nextStep);
     } catch {
@@ -192,9 +215,24 @@ export default function TrimlyBooking() {
 
     try {
       const data = await getDisponibilidad({ fecha, publicToken });
+      const horas = Array.isArray(data?.horas) ? data.horas : [];
+
+      if (!horas.length) {
+        setState((current) => ({
+          ...current,
+          fechasDisponibles: current.fechasDisponibles.filter((dateKey) => dateKey !== fecha),
+          fechaSeleccionada: '',
+          horaSeleccionada: null,
+          horasDisponibles: [],
+        }));
+        setError('Esta fecha ya no tiene horarios disponibles. Elige otro día.');
+        setStep('calendar');
+        return;
+      }
+
       setState((current) => ({
         ...current,
-        horasDisponibles: Array.isArray(data?.horas) ? data.horas : [],
+        horasDisponibles: horas,
       }));
       setStep('times');
     } catch {
