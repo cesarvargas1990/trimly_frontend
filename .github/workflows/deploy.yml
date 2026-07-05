@@ -1,0 +1,52 @@
+name: Deploy (SSH)
+
+on:
+  workflow_run:
+    workflows: ["GitHub Flow"]
+    branches: ["main"]
+    types:
+      - completed
+  workflow_dispatch:
+
+concurrency:
+  group: trimly-frontend-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy via SSH
+    if: >-
+      ${{
+        github.event_name == 'workflow_dispatch' ||
+        (
+          github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'push'
+        )
+      }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            set -e
+
+            DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
+            if [ -z "$DEPLOY_PATH" ]; then
+              DEPLOY_PATH="/home/${{ secrets.SSH_USER }}/trimly_frontend"
+            fi
+
+            API_BASE_URL="${{ secrets.VITE_API_BASE_URL }}"
+            if [ -z "$API_BASE_URL" ]; then
+              API_BASE_URL="https://cesarvargas.tech/trimly/api/v1"
+            fi
+
+            cd "$DEPLOY_PATH"
+            git pull --ff-only origin main
+
+            VITE_API_BASE_URL="$API_BASE_URL" docker compose up --build -d --remove-orphans

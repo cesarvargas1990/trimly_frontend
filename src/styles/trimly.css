@@ -305,6 +305,15 @@ button:disabled {
   color: var(--text);
 }
 
+.phone-input input::placeholder {
+  color: rgba(245, 245, 245, 0.36);
+  opacity: 1;
+}
+
+.phone-input:focus-within input::placeholder {
+  color: transparent;
+}
+
 .text-input:focus,
 .phone-input:focus-within {
   border-color: var(--gold);
