@@ -5,6 +5,9 @@ import PrimaryButton from '../../components/PrimaryButton.jsx';
 import StepHeader from '../../components/StepHeader.jsx';
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const namePattern = /^[\p{L}]+(?:[ '-][\p{L}]+)*$/u;
+const repeatedLettersPattern = /([\p{L}])\1{3,}/iu;
+const maxNameLength = 60;
 
 export default function RegisterStep({ onSubmit, onBack, loading, error }) {
   const [nombre, setNombre] = useState('');
@@ -14,20 +17,29 @@ export default function RegisterStep({ onSubmit, onBack, loading, error }) {
   function handleSubmit(event) {
     event.preventDefault();
     const cleanName = nombre.trim().replace(/\s+/g, ' ');
-    const words = cleanName.split(' ').filter(Boolean);
+    const cleanEmail = email.trim();
 
-    if (words.length < 2) {
-      setLocalError('Ingresa tu nombre completo.');
+    if (!cleanName) {
+      setLocalError('Ingresa tu nombre.');
       return;
     }
 
-    if (!emailPattern.test(email.trim())) {
+    if (
+      cleanName.length > maxNameLength ||
+      !namePattern.test(cleanName) ||
+      repeatedLettersPattern.test(cleanName)
+    ) {
+      setLocalError('Ingresa un nombre válido, sin números ni caracteres raros.');
+      return;
+    }
+
+    if (cleanEmail && !emailPattern.test(cleanEmail)) {
       setLocalError('Ingresa un email válido.');
       return;
     }
 
     setLocalError('');
-    onSubmit({ nombre: cleanName, email: email.trim() });
+    onSubmit({ nombre: cleanName, email: cleanEmail });
   }
 
   return (
@@ -41,26 +53,28 @@ export default function RegisterStep({ onSubmit, onBack, loading, error }) {
         <p className="helper-note">Solo te pediremos estos datos una vez.</p>
       </StepHeader>
 
-      <label className="field-label" htmlFor="nombre">Nombre completo</label>
+      <label className="field-label" htmlFor="nombre">Nombre</label>
       <input
         id="nombre"
         className="text-input"
         autoComplete="name"
-        placeholder="Juan Pérez"
+        placeholder="Juan"
         value={nombre}
         onChange={(event) => setNombre(event.target.value)}
       />
 
-      <label className="field-label" htmlFor="email">Email</label>
+      <label className="field-label" htmlFor="email">Email (opcional)</label>
       <input
         id="email"
         className="text-input"
-        type="email"
+        type="text"
+        inputMode="email"
         autoComplete="email"
         placeholder="juanperez@gmail.com"
         value={email}
         onChange={(event) => setEmail(event.target.value)}
       />
+      <p className="field-hint">Lo usamos para enviarte recordatorios de tu cita.</p>
 
       <AlertMessage type="error" message={localError || error} />
       <PrimaryButton type="submit" loading={loading}>Continuar</PrimaryButton>
