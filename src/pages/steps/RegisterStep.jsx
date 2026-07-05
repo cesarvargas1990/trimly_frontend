@@ -37,7 +37,9 @@ export default function RegisterStep({ onSubmit, onBack, loading, error }) {
         title="Completa tus datos"
         description="Es la primera vez que reservas con nosotros."
         onBack={onBack}
-      />
+      >
+        <p className="helper-note">Solo te pediremos estos datos una vez.</p>
+      </StepHeader>
 
       <label className="field-label" htmlFor="nombre">Nombre completo</label>
       <input
