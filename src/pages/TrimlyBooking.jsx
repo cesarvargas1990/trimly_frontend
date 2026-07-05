@@ -197,7 +197,7 @@ export default function TrimlyBooking() {
   }
 
   async function handlePreconfirm() {
-    if (!state.horaSeleccionada) return;
+    if (!state.horaSeleccionada || loading) return;
 
     setLoading(true);
     setError('');
@@ -216,6 +216,10 @@ export default function TrimlyBooking() {
       }));
       setStep('preconfirm');
     } catch {
+      setState((current) => ({
+        ...current,
+        horaSeleccionada: null,
+      }));
       setError(friendlyErrors.preconfirm);
     } finally {
       setLoading(false);

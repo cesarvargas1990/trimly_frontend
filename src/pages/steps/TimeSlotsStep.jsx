@@ -40,6 +40,7 @@ export default function TimeSlotsStep({
             key={hora.value}
             type="button"
             className={`slot-button ${selectedHour?.value === hora.value ? 'selected' : ''}`}
+            disabled={loading}
             onClick={() => onSelectHour(hora)}
           >
             {hora.label}
@@ -47,7 +48,7 @@ export default function TimeSlotsStep({
         ))}
       </div>
 
-      <PrimaryButton disabled={!selectedHour} onClick={onContinue}>
+      <PrimaryButton disabled={!selectedHour || loading} loading={loading} onClick={onContinue}>
         Continuar
       </PrimaryButton>
     </div>

@@ -479,6 +479,10 @@ button:disabled {
   color: #22180a;
 }
 
+.slot-button:disabled {
+  opacity: 0.62;
+}
+
 .time-slots-card {
   justify-content: flex-start;
   gap: 13px;
