@@ -15,7 +15,7 @@ export default function TimeSlotsStep({
   error,
 }) {
   return (
-    <div className="step-card">
+    <div className="step-card time-slots-card">
       <StepHeader
         step="Paso 3 de 4"
         title="Horarios disponibles"

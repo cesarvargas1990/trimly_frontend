@@ -445,16 +445,18 @@ button:disabled {
 
 .slots-list {
   display: grid;
-  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
 }
 
 .slot-button {
-  min-height: 50px;
+  min-height: 46px;
   border: 1px solid rgba(201, 164, 100, 0.45);
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.025);
   color: var(--text);
-  font-weight: 650;
+  font-size: 0.95rem;
+  font-weight: 750;
   transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
 }
 
@@ -462,6 +464,23 @@ button:disabled {
   border-color: var(--gold-light);
   background: linear-gradient(135deg, var(--gold), var(--gold-light));
   color: #22180a;
+}
+
+.time-slots-card {
+  justify-content: flex-start;
+  gap: 13px;
+}
+
+.time-slots-card .top-bar {
+  margin-bottom: 24px;
+}
+
+.time-slots-card .step-description {
+  margin-top: 6px;
+}
+
+.time-slots-card .button {
+  margin-top: 2px;
 }
 
 .success-screen {

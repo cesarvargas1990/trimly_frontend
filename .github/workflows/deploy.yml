@@ -1,11 +1,8 @@
 name: Deploy (SSH)
 
 on:
-  workflow_run:
-    workflows: ["GitHub Flow"]
+  push:
     branches: ["main"]
-    types:
-      - completed
   workflow_dispatch:
 
 concurrency:
@@ -15,14 +12,6 @@ concurrency:
 jobs:
   deploy:
     name: Deploy via SSH
-    if: >-
-      ${{
-        github.event_name == 'workflow_dispatch' ||
-        (
-          github.event.workflow_run.conclusion == 'success' &&
-          github.event.workflow_run.event == 'push'
-        )
-      }}
     runs-on: ubuntu-latest
 
     steps:
