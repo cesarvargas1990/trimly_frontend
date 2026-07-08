@@ -32,7 +32,7 @@ jobs:
 
             API_BASE_URL="${{ secrets.VITE_API_BASE_URL }}"
             if [ -z "$API_BASE_URL" ]; then
-              API_BASE_URL="https://cesarvargas.tech/trimly/api/v1"
+              API_BASE_URL="https://trimlybook.com/api/v1"
             fi
 
             cd "$DEPLOY_PATH"

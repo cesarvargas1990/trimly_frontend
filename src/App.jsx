@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import TrimlyBooking from './pages/TrimlyBooking.jsx';
 import AlertMessage from './components/AlertMessage.jsx';
 
@@ -20,9 +20,10 @@ function MissingToken() {
 export default function App() {
   return (
     <Routes>
+      <Route path="/:publicToken" element={<TrimlyBooking />} />
       <Route path="/trimly/:publicToken" element={<TrimlyBooking />} />
       <Route path="/trimly" element={<MissingToken />} />
-      <Route path="/" element={<Navigate to="/trimly" replace />} />
+      <Route path="/" element={<MissingToken />} />
       <Route path="*" element={<MissingToken />} />
     </Routes>
   );
