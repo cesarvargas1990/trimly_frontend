@@ -8,7 +8,6 @@ export default function BusinessHero({ empresa, barbero, onStart }) {
 
   return (
     <div className="welcome-screen">
-      <p className="brand">Trimly</p>
       <div className="hero-title">
         <h1>{title}</h1>
         <p>{businessName}</p>
