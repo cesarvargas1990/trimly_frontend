@@ -29,11 +29,6 @@ export default function BusinessHero({ empresa, barbero, onStart }) {
           <strong>{barbero?.especialidad || empresa?.especialidad || 'Barbería'}</strong>
         </div>
         <div className="detail-item">
-          <Clock size={17} />
-          <span>Duración promedio</span>
-          <strong>Según disponibilidad</strong>
-        </div>
-        <div className="detail-item">
           <MapPin size={17} />
           <span>Ubicación</span>
           <strong>{empresa?.ubicacion || 'Por confirmar'}</strong>
