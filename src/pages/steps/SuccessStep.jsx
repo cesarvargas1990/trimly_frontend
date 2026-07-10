@@ -6,7 +6,7 @@ export default function SuccessStep({ citaConfirmada, empresa, barbero, onRestar
   const cita = citaConfirmada?.cita || {};
   const canDownloadCalendar = Boolean(cita.fecha && cita.hora);
 
-  async function handleCalendarDownload() {
+  function handleCalendarDownload() {
     const calendarFile = buildCalendarFile({
       cita,
       codigo: citaConfirmada?.codigo,
@@ -16,15 +16,12 @@ export default function SuccessStep({ citaConfirmada, empresa, barbero, onRestar
 
     if (!calendarFile) return;
 
-    if (isInstagramBrowser()) {
-      openCalendarFallback(calendarFile);
+    if (isIosSafari()) {
+      openNativeCalendarFile(calendarFile);
       return;
     }
 
-    const shared = await shareCalendarFile(calendarFile);
-    if (shared) return;
-
-    downloadCalendarFile(calendarFile);
+    openGoogleCalendar(calendarFile);
   }
 
   return (
@@ -54,49 +51,23 @@ export default function SuccessStep({ citaConfirmada, empresa, barbero, onRestar
   );
 }
 
-function downloadCalendarFile(calendarFile) {
+function openNativeCalendarFile(calendarFile) {
   const blob = new Blob([calendarFile.content], { type: 'text/calendar;charset=utf-8' });
   const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = calendarFile.filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  window.location.assign(url);
+  window.setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
 
-async function shareCalendarFile(calendarFile) {
-  if (!window.File || !navigator.canShare || !navigator.share) return false;
-
-  const file = new File([calendarFile.content], calendarFile.filename, { type: 'text/calendar' });
-  const shareData = {
-    title: calendarFile.title,
-    text: calendarFile.title,
-    files: [file],
-  };
-
-  if (!navigator.canShare(shareData)) return false;
-
-  try {
-    await navigator.share(shareData);
-    return true;
-  } catch (error) {
-    return error?.name === 'AbortError';
-  }
-}
-
-function openCalendarFallback(calendarFile) {
+function openGoogleCalendar(calendarFile) {
   const url = buildGoogleCalendarUrl(calendarFile);
-  const opened = window.open(url, '_blank', 'noopener,noreferrer');
-
-  if (!opened) {
-    window.location.assign(url);
-  }
+  window.location.assign(url);
 }
 
-function isInstagramBrowser() {
-  return /Instagram/i.test(navigator.userAgent);
+function isIosSafari() {
+  const userAgent = navigator.userAgent;
+  const isIos = /iPad|iPhone|iPod/i.test(userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isSafari = /Safari/i.test(userAgent) && !/CriOS|FxiOS|EdgiOS|Instagram|FBAN|FBAV/i.test(userAgent);
+  return isIos && isSafari;
 }
 
 function SummaryItem({ icon: Icon, label, value }) {
