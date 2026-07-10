@@ -6,7 +6,7 @@ export default function SuccessStep({ citaConfirmada, empresa, barbero, onRestar
   const cita = citaConfirmada?.cita || {};
   const canDownloadCalendar = Boolean(cita.fecha && cita.hora);
 
-  function handleCalendarDownload() {
+  async function handleCalendarDownload() {
     const calendarFile = buildCalendarFile({
       cita,
       codigo: citaConfirmada?.codigo,
@@ -16,15 +16,15 @@ export default function SuccessStep({ citaConfirmada, empresa, barbero, onRestar
 
     if (!calendarFile) return;
 
-    const blob = new Blob([calendarFile.content], { type: 'text/calendar;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = calendarFile.filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    if (isInstagramBrowser()) {
+      openCalendarFallback(calendarFile);
+      return;
+    }
+
+    const shared = await shareCalendarFile(calendarFile);
+    if (shared) return;
+
+    downloadCalendarFile(calendarFile);
   }
 
   return (
@@ -54,6 +54,51 @@ export default function SuccessStep({ citaConfirmada, empresa, barbero, onRestar
   );
 }
 
+function downloadCalendarFile(calendarFile) {
+  const blob = new Blob([calendarFile.content], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = calendarFile.filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+async function shareCalendarFile(calendarFile) {
+  if (!window.File || !navigator.canShare || !navigator.share) return false;
+
+  const file = new File([calendarFile.content], calendarFile.filename, { type: 'text/calendar' });
+  const shareData = {
+    title: calendarFile.title,
+    text: calendarFile.title,
+    files: [file],
+  };
+
+  if (!navigator.canShare(shareData)) return false;
+
+  try {
+    await navigator.share(shareData);
+    return true;
+  } catch (error) {
+    return error?.name === 'AbortError';
+  }
+}
+
+function openCalendarFallback(calendarFile) {
+  const url = buildGoogleCalendarUrl(calendarFile);
+  const opened = window.open(url, '_blank', 'noopener,noreferrer');
+
+  if (!opened) {
+    window.location.assign(url);
+  }
+}
+
+function isInstagramBrowser() {
+  return /Instagram/i.test(navigator.userAgent);
+}
+
 function SummaryItem({ icon: Icon, label, value }) {
   if (!value) return null;
 
@@ -80,6 +125,8 @@ function buildCalendarFile({ cita, codigo, empresa, barbero }) {
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Bogota';
   const barberName = cita.barbero || barbero?.nombre || 'tu barbero';
   const businessName = empresa?.nombre || 'la barbería';
+  const title = `Cita con ${barberName}`;
+  const location = empresa?.ubicacion || '';
   const uid = `${codigo || Date.now()}@trimly`;
   const description = [
     `Recordatorio de mi cita con ${barberName}.`,
@@ -102,9 +149,9 @@ function buildCalendarFile({ cita, codigo, empresa, barbero }) {
     `DTSTAMP:${formatUtcDate(new Date())}`,
     `DTSTART;TZID=${timeZone}:${formatLocalDate(startDate)}`,
     `DTEND;TZID=${timeZone}:${formatLocalDate(endDate)}`,
-    `SUMMARY:${escapeIcsText(`Cita con ${barberName}`)}`,
+    `SUMMARY:${escapeIcsText(title)}`,
     `DESCRIPTION:${escapeIcsText(description)}`,
-    empresa?.ubicacion ? `LOCATION:${escapeIcsText(empresa.ubicacion)}` : '',
+    location ? `LOCATION:${escapeIcsText(location)}` : '',
     'BEGIN:VALARM',
     'ACTION:DISPLAY',
     `DESCRIPTION:${escapeIcsText(`Recordatorio de mi cita con ${barberName}`)}`,
@@ -116,8 +163,28 @@ function buildCalendarFile({ cita, codigo, empresa, barbero }) {
 
   return {
     content: `${content}\r\n`,
+    description,
+    endDate,
     filename: `trimly-cita-${cita.fecha || 'calendario'}.ics`,
+    location,
+    startDate,
+    title,
   };
+}
+
+function buildGoogleCalendarUrl(calendarFile) {
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: calendarFile.title,
+    dates: `${formatGoogleCalendarDate(calendarFile.startDate)}/${formatGoogleCalendarDate(calendarFile.endDate)}`,
+    details: calendarFile.description,
+  });
+
+  if (calendarFile.location) {
+    params.set('location', calendarFile.location);
+  }
+
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
 function parseAppointmentDate(dateKey, timeLabel) {
@@ -151,6 +218,10 @@ function formatLocalDate(date) {
 }
 
 function formatUtcDate(date) {
+  return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+}
+
+function formatGoogleCalendarDate(date) {
   return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
 }
 
