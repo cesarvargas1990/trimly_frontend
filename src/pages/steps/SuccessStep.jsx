@@ -1,18 +1,24 @@
 import { Check, CalendarDays, CalendarPlus, Clock, Hash, Scissors, UserRound, Phone } from 'lucide-react';
+import { useState } from 'react';
 import PrimaryButton from '../../components/PrimaryButton.jsx';
 import { formatLongDate } from '../../utils/dates.js';
 
 export default function SuccessStep({ citaConfirmada, empresa, barbero, onRestart }) {
   const cita = citaConfirmada?.cita || {};
   const canDownloadCalendar = Boolean(cita.fecha && cita.hora);
+  const [showCalendarOptions, setShowCalendarOptions] = useState(false);
 
-  function handleCalendarDownload() {
-    const calendarFile = buildCalendarFile({
+  function getCalendarFile() {
+    return buildCalendarFile({
       cita,
       codigo: citaConfirmada?.codigo,
       empresa,
       barbero,
     });
+  }
+
+  function handleCalendarDownload() {
+    const calendarFile = getCalendarFile();
 
     if (!calendarFile) return;
 
@@ -26,7 +32,17 @@ export default function SuccessStep({ citaConfirmada, empresa, barbero, onRestar
       return;
     }
 
-    downloadCalendarFile(calendarFile);
+    setShowCalendarOptions(true);
+  }
+
+  function handleOpenGoogleCalendar() {
+    const calendarFile = getCalendarFile();
+    if (calendarFile) openGoogleCalendar(calendarFile);
+  }
+
+  function handleDownloadCalendarFile() {
+    const calendarFile = getCalendarFile();
+    if (calendarFile) downloadCalendarFile(calendarFile);
   }
 
   return (
@@ -51,6 +67,17 @@ export default function SuccessStep({ citaConfirmada, empresa, barbero, onRestar
         <CalendarPlus size={18} />
         Agregar a mi calendario
       </PrimaryButton>
+      {showCalendarOptions ? (
+        <div className="calendar-options">
+          <PrimaryButton onClick={handleOpenGoogleCalendar}>
+            <CalendarPlus size={18} />
+            Abrir Google Calendar
+          </PrimaryButton>
+          <PrimaryButton variant="secondary" onClick={handleDownloadCalendarFile}>
+            Descargar .ics
+          </PrimaryButton>
+        </div>
+      ) : null}
       <PrimaryButton onClick={onRestart}>Volver al inicio</PrimaryButton>
     </div>
   );
