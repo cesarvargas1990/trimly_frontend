@@ -16,12 +16,17 @@ export default function SuccessStep({ citaConfirmada, empresa, barbero, onRestar
 
     if (!calendarFile) return;
 
+    if (isInstagramBrowser()) {
+      openGoogleCalendar(calendarFile);
+      return;
+    }
+
     if (isIosSafari()) {
       openNativeCalendarFile(calendarFile);
       return;
     }
 
-    openGoogleCalendar(calendarFile);
+    downloadCalendarFile(calendarFile);
   }
 
   return (
@@ -58,9 +63,25 @@ function openNativeCalendarFile(calendarFile) {
   window.setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
 
+function downloadCalendarFile(calendarFile) {
+  const blob = new Blob([calendarFile.content], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = calendarFile.filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
 function openGoogleCalendar(calendarFile) {
   const url = buildGoogleCalendarUrl(calendarFile);
   window.location.assign(url);
+}
+
+function isInstagramBrowser() {
+  return /Instagram/i.test(navigator.userAgent);
 }
 
 function isIosSafari() {
