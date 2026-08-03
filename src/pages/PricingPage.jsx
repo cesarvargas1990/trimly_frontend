@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   ArrowRight,
   Bell,
@@ -8,7 +9,6 @@ import {
   Lock,
   MessageCircle,
   ShieldCheck,
-  Sparkles,
   TrendingUp,
   UserRound,
   UsersRound,
@@ -19,15 +19,15 @@ const WHATSAPP_NUMBER = '573184469889';
 
 const packages = [
   {
-    citas: 50,
-    precio: '$9.500',
-    etiqueta: 'Inicio rápido',
-    descripcion: 'Para probar Trimly con clientes frecuentes.',
+    citas: 10,
+    precio: 'Gratis',
+    etiqueta: 'Gratis',
+    descripcion: 'Para probar Trimly y empezar con tus primeras reservas.',
   },
   {
     citas: 100,
-    precio: '$11.000',
-    etiqueta: 'Ligero',
+    precio: '$10.000',
+    etiqueta: 'Inicio rápido',
     descripcion: 'Ideal si estás organizando la agenda por primera vez.',
   },
   {
@@ -70,6 +70,19 @@ function buildWhatsappLink(plan) {
 }
 
 export default function PricingPage() {
+  const [activeSection, setActiveSection] = useState(() => window.location.hash || '#inicio');
+
+  useEffect(() => {
+    const updateActiveSection = () => setActiveSection(window.location.hash || '#inicio');
+
+    updateActiveSection();
+    window.addEventListener('hashchange', updateActiveSection);
+
+    return () => window.removeEventListener('hashchange', updateActiveSection);
+  }, []);
+
+  const getNavClassName = (section) => (activeSection === section ? 'active' : undefined);
+
   return (
     <main className="pricing-page">
       <header className="pricing-nav">
@@ -78,10 +91,10 @@ export default function PricingPage() {
           <span>Trimly</span>
         </a>
         <nav className="pricing-menu" aria-label="Navegación principal">
-          <a href="/">Inicio</a>
-          <a href="#funcionalidades">Funcionalidades</a>
-          <a className="active" href="#precios">Precios</a>
-          <a href="#contacto">Contacto</a>
+          <a className={getNavClassName('#inicio')} href="#inicio">Inicio</a>
+          <a className={getNavClassName('#funcionalidades')} href="#funcionalidades">Funcionalidades</a>
+          <a className={getNavClassName('#precios')} href="#precios">Precios</a>
+          <a className={getNavClassName('#contacto')} href="#contacto">Contacto</a>
         </nav>
         <a
           className="pricing-whatsapp"
@@ -98,12 +111,13 @@ export default function PricingPage() {
         <img className="pricing-hero-image" src={barberHero} alt="Barbero profesional atendiendo a un cliente" />
         <div className="pricing-hero-shade" />
         <div className="pricing-copy">
-          <p className="pricing-kicker">Agenda para barberías</p>
+          <p className="pricing-kicker">Agenda para barberías, peluquerías, salones y uñas</p>
           <h1>
             Tu agenda, <span>sin complicaciones</span>
           </h1>
           <p>
-            Gestiona citas, clientes y servicios desde un flujo simple. Tus clientes reservan y tú te enfocas en cortar.
+            Gestiona citas, clientes y servicios desde un flujo simple. Tus clientes reservan, tú te enfocas en cortar
+            y puedes empezar con un paquete gratis.
           </p>
           <div className="pricing-hero-points" id="funcionalidades" aria-label="Funcionalidades">
             {heroFeatures.map(({ icon: Icon, title, text }) => (
@@ -115,27 +129,6 @@ export default function PricingPage() {
             ))}
           </div>
         </div>
-
-        <aside className="pricing-help-card" id="contacto" aria-label="Contacto por WhatsApp">
-          <div className="pricing-help-head">
-            <span>
-              <MessageCircle size={23} />
-            </span>
-            <strong>¿Necesitas ayuda?</strong>
-          </div>
-          <p>Chatea con nosotros por WhatsApp y te ayudamos a elegir el paquete correcto.</p>
-          <div className="chat-bubble sent">Hola, quiero más información sobre los paquetes de citas.</div>
-          <div className="chat-bubble received">¡Hola! Te contamos cómo funcionan y cuál te conviene.</div>
-          <a
-            className="pricing-help-action"
-            href={`https://wa.me/${WHATSAPP_NUMBER}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <MessageCircle size={18} />
-            Chatear por WhatsApp
-          </a>
-        </aside>
 
         <div className="pricing-summary" aria-label="Resumen de créditos">
           <ShieldCheck size={25} />
@@ -203,7 +196,7 @@ export default function PricingPage() {
                 </ul>
 
                 <a className="pricing-action" href={buildWhatsappLink(plan)} target="_blank" rel="noreferrer">
-                  Comprar
+                  {plan.precio === 'Gratis' ? 'Pedir' : 'Comprar'}
                   <ArrowRight size={17} />
                 </a>
               </article>
@@ -228,6 +221,27 @@ export default function PricingPage() {
               <Lock size={20} />
               <p>Compra segura y soporte directo por WhatsApp.</p>
             </div>
+          </aside>
+
+          <aside className="pricing-help-card" id="contacto" aria-label="Contacto por WhatsApp">
+            <div className="pricing-help-head">
+              <span>
+                <MessageCircle size={23} />
+              </span>
+              <strong>¿Necesitas ayuda?</strong>
+            </div>
+            <p>Chatea con nosotros por WhatsApp y te ayudamos a elegir el paquete correcto.</p>
+            <div className="chat-bubble sent">Hola, quiero más información sobre los paquetes de citas.</div>
+            <div className="chat-bubble received">¡Hola! Te contamos cómo funcionan y cuál te conviene.</div>
+            <a
+              className="pricing-help-action"
+              href={`https://wa.me/${WHATSAPP_NUMBER}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <MessageCircle size={18} />
+              Chatear por WhatsApp
+            </a>
           </aside>
         </div>
 
