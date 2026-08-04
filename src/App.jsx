@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import TrimlyBooking from './pages/TrimlyBooking.jsx';
 import PricingPage from './pages/PricingPage.jsx';
+import AppointmentReminder from './pages/AppointmentReminder.jsx';
 import AlertMessage from './components/AlertMessage.jsx';
 
 function MissingToken() {
@@ -23,6 +24,8 @@ export default function App() {
     <Routes>
       <Route path="/paquetes" element={<PricingPage />} />
       <Route path="/precios" element={<PricingPage />} />
+      <Route path="/cita/:codigo" element={<AppointmentReminder />} />
+      <Route path="/trimly/cita/:codigo" element={<AppointmentReminder />} />
       <Route path="/:publicToken" element={<TrimlyBooking />} />
       <Route path="/trimly/:publicToken" element={<TrimlyBooking />} />
       <Route path="/trimly" element={<MissingToken />} />

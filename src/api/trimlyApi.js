@@ -120,3 +120,7 @@ export function confirmarCita({ bookingSession, fecha, hora, publicToken }) {
     }),
   });
 }
+
+export function getDetalleCita(codigo) {
+  return request(`/citas/${encodeURIComponent(codigo)}/confirmacion`);
+}
