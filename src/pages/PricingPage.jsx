@@ -13,7 +13,7 @@ import {
   UserRound,
   UsersRound,
 } from 'lucide-react';
-import barberHero from '../assets/trimly-barber-hero.png';
+import barberHero from '../assets/trimly-barber-hero.webp';
 
 const WHATSAPP_NUMBER = '573184469889';
 
