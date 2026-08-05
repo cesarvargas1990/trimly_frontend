@@ -25,7 +25,9 @@ export default function App() {
       <Route path="/paquetes" element={<PricingPage />} />
       <Route path="/precios" element={<PricingPage />} />
       <Route path="/cita/:codigo" element={<AppointmentReminder />} />
+      <Route path="/cita/:codigo/confirmacion" element={<AppointmentReminder />} />
       <Route path="/trimly/cita/:codigo" element={<AppointmentReminder />} />
+      <Route path="/trimly/cita/:codigo/confirmacion" element={<AppointmentReminder />} />
       <Route path="/:publicToken" element={<TrimlyBooking />} />
       <Route path="/trimly/:publicToken" element={<TrimlyBooking />} />
       <Route path="/trimly" element={<MissingToken />} />
