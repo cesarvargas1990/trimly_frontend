@@ -955,6 +955,20 @@ button:disabled {
     #f7f7f5;
 }
 
+.pricing-contact-section {
+  padding: 28px clamp(18px, 4vw, 64px);
+  background: #fff;
+}
+
+.pricing-contact-section .pricing-help-card {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.pricing-details-section {
+  padding-top: 0;
+}
+
 .pricing-section-head {
   display: grid;
   justify-items: center;
@@ -1283,7 +1297,7 @@ button:disabled {
   }
 
   .pricing-grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 18px;
   }
 

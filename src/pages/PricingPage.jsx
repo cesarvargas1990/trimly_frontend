@@ -19,33 +19,27 @@ const WHATSAPP_NUMBER = '573184469889';
 
 const packages = [
   {
-    citas: 10,
-    precio: 'Gratis',
+    citas: 99,
+    precio: '$0',
     etiqueta: 'Gratis',
     descripcion: 'Para probar Trimly y empezar con tus primeras reservas.',
   },
   {
-    citas: 100,
-    precio: '$10.000',
-    etiqueta: 'Inicio rápido',
+    citas: 300,
+    precio: '$9.900',
+    etiqueta: 'Inicio',
     descripcion: 'Ideal si estás organizando la agenda por primera vez.',
   },
   {
-    citas: 250,
-    precio: '$15.000',
+    citas: 750,
+    precio: '$19.900',
     etiqueta: 'Popular',
     descripcion: 'La opción más equilibrada para una barbería activa.',
     destacado: true,
   },
   {
-    citas: 500,
-    precio: '$20.500',
-    etiqueta: 'Crecimiento',
-    descripcion: 'Para equipos con agenda constante durante el mes.',
-  },
-  {
-    citas: 1000,
-    precio: '$30.000',
+    citas: 2000,
+    precio: '$39.900',
     etiqueta: 'Alto volumen',
     descripcion: 'Pensado para barberías con alta demanda.',
   },
@@ -65,7 +59,7 @@ const trustItems = [
 ];
 
 function buildWhatsappLink(plan) {
-  const message = `Hola, quiero comprar el paquete de ${plan.citas} citas de Trimly por ${plan.precio}.`;
+  const message = `Hola, quiero comprar el paquete de ${plan.citas} reservas de Trimly por ${plan.precio}.`;
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
@@ -107,36 +101,6 @@ export default function PricingPage() {
         </a>
       </header>
 
-      <section className="pricing-hero" id="inicio">
-        <img className="pricing-hero-image" src={barberHero} alt="Barbero profesional atendiendo a un cliente" />
-        <div className="pricing-hero-shade" />
-        <div className="pricing-copy">
-          <p className="pricing-kicker">Agenda para barberías, peluquerías, salones y uñas</p>
-          <h1>
-            Tu agenda, <span>sin complicaciones</span>
-          </h1>
-          <p>
-            Gestiona citas, clientes y servicios desde un flujo simple. Tus clientes reservan, tú te enfocas en cortar
-            y puedes empezar con un paquete gratis.
-          </p>
-          <div className="pricing-hero-points" id="funcionalidades" aria-label="Funcionalidades">
-            {heroFeatures.map(({ icon: Icon, title, text }) => (
-              <span key={title}>
-                <Icon size={20} />
-                <strong>{title}</strong>
-                <small>{text}</small>
-              </span>
-            ))}
-          </div>
-        </div>
-
-        <div className="pricing-summary" aria-label="Resumen de créditos">
-          <ShieldCheck size={25} />
-          <span>Tus citas nunca vencen</span>
-          <strong>Compra una sola vez y úsalas cuando quieras.</strong>
-        </div>
-      </section>
-
       <section className="pricing-section" id="precios">
         <div className="pricing-section-head">
           <p className="pricing-kicker">Créditos Trimly</p>
@@ -172,8 +136,8 @@ export default function PricingPage() {
                   </span>
                   <div>
                     <span>{plan.etiqueta}</span>
-                    <h2>{plan.citas}</h2>
-                    <p>citas</p>
+                    <h2>{plan.citas.toLocaleString('es-CO')}</h2>
+                    <p>reservas</p>
                   </div>
                 </div>
 
@@ -196,13 +160,71 @@ export default function PricingPage() {
                 </ul>
 
                 <a className="pricing-action" href={buildWhatsappLink(plan)} target="_blank" rel="noreferrer">
-                  {plan.precio === 'Gratis' ? 'Pedir' : 'Comprar'}
+                  {plan.precio === '$0' ? 'Pedir' : 'Comprar'}
                   <ArrowRight size={17} />
                 </a>
               </article>
             ))}
           </section>
 
+        </div>
+      </section>
+
+      <section className="pricing-hero" id="inicio">
+        <img className="pricing-hero-image" src={barberHero} alt="Barbero profesional atendiendo a un cliente" />
+        <div className="pricing-hero-shade" />
+        <div className="pricing-copy">
+          <p className="pricing-kicker">Agenda para barberías, peluquerías, salones y uñas</p>
+          <h1>
+            Tu agenda, <span>sin complicaciones</span>
+          </h1>
+          <p>
+            Gestiona citas, clientes y servicios desde un flujo simple. Tus clientes reservan, tú te enfocas en cortar
+            y puedes empezar con un paquete gratis.
+          </p>
+          <div className="pricing-hero-points" id="funcionalidades" aria-label="Funcionalidades">
+            {heroFeatures.map(({ icon: Icon, title, text }) => (
+              <span key={title}>
+                <Icon size={20} />
+                <strong>{title}</strong>
+                <small>{text}</small>
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="pricing-summary" aria-label="Resumen de créditos">
+          <ShieldCheck size={25} />
+          <span>Tus citas nunca vencen</span>
+          <strong>Compra una sola vez y úsalas cuando quieras.</strong>
+        </div>
+      </section>
+
+      <section className="pricing-contact-section" id="contacto">
+        <aside className="pricing-help-card" aria-label="Contacto por WhatsApp">
+          <div className="pricing-help-head">
+            <span>
+              <MessageCircle size={23} />
+            </span>
+            <strong>¿Necesitas ayuda?</strong>
+          </div>
+          <p>Chatea con nosotros por WhatsApp y te ayudamos a elegir el paquete correcto.</p>
+          <div className="chat-bubble sent">Hola, quiero más información sobre los paquetes de citas.</div>
+          <div className="chat-bubble received">¡Hola! Te contamos cómo funcionan y cuál te conviene.</div>
+          <a
+            className="pricing-help-action"
+            href={`https://wa.me/${WHATSAPP_NUMBER}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <MessageCircle size={18} />
+            Chatear por WhatsApp
+          </a>
+        </aside>
+      </section>
+
+      <section className="pricing-section pricing-details-section">
+        <div className="pricing-content">
           <aside className="pricing-info-card" aria-label="Cómo funcionan los créditos">
             <h3>¿Cómo funcionan los créditos?</h3>
             <div>
@@ -221,27 +243,6 @@ export default function PricingPage() {
               <Lock size={20} />
               <p>Compra segura y soporte directo por WhatsApp.</p>
             </div>
-          </aside>
-
-          <aside className="pricing-help-card" id="contacto" aria-label="Contacto por WhatsApp">
-            <div className="pricing-help-head">
-              <span>
-                <MessageCircle size={23} />
-              </span>
-              <strong>¿Necesitas ayuda?</strong>
-            </div>
-            <p>Chatea con nosotros por WhatsApp y te ayudamos a elegir el paquete correcto.</p>
-            <div className="chat-bubble sent">Hola, quiero más información sobre los paquetes de citas.</div>
-            <div className="chat-bubble received">¡Hola! Te contamos cómo funcionan y cuál te conviene.</div>
-            <a
-              className="pricing-help-action"
-              href={`https://wa.me/${WHATSAPP_NUMBER}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <MessageCircle size={18} />
-              Chatear por WhatsApp
-            </a>
           </aside>
         </div>
 
