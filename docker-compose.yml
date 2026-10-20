@@ -8,3 +8,11 @@ services:
     ports:
       - "84:80"
     restart: unless-stopped
+    networks:
+      - default
+      - trimly_backend
+
+networks:
+  trimly_backend:
+    external: true
+    name: trimly_backend_default
