@@ -17,6 +17,7 @@ import PhoneStep from './steps/PhoneStep.jsx';
 import PreConfirmStep from './steps/PreConfirmStep.jsx';
 import RegisterStep from './steps/RegisterStep.jsx';
 import SuccessStep from './steps/SuccessStep.jsx';
+import ServiceStep from './steps/ServiceStep.jsx';
 import TimeSlotsStep from './steps/TimeSlotsStep.jsx';
 import WelcomeStep from './steps/WelcomeStep.jsx';
 import { isPastDateKey } from '../utils/dates.js';
@@ -33,6 +34,8 @@ const initialBooking = {
   fechaSeleccionada: '',
   horasDisponibles: [],
   horaSeleccionada: null,
+  servicios: [],
+  servicioSeleccionado: null,
   preconfirmacion: null,
   citaConfirmada: null,
 };
@@ -47,12 +50,12 @@ const friendlyErrors = {
   confirm: 'No pudimos confirmar la cita. Intenta nuevamente.',
 };
 
-async function filterDatesWithAvailability({ fechas, publicToken }) {
+async function filterDatesWithAvailability({ fechas, publicToken, servicioId }) {
   const futureDates = fechas.filter((fecha) => !isPastDateKey(fecha));
   const results = await Promise.all(
     futureDates.map(async (fecha) => {
       try {
-        const data = await getDisponibilidad({ fecha, publicToken });
+        const data = await getDisponibilidad({ fecha, publicToken, servicioId });
         return Array.isArray(data?.horas) && data.horas.length > 0 ? fecha : null;
       } catch {
         return null;
@@ -102,6 +105,7 @@ export default function TrimlyBooking() {
           ...current,
           empresa: data?.empresa || null,
           barbero: data?.barbero || null,
+          servicios: Array.isArray(data?.barbero?.servicios) ? data.barbero.servicios : [],
           activo: data?.activo,
         }));
         setStep('welcome');
@@ -126,9 +130,9 @@ export default function TrimlyBooking() {
     setError('');
 
     try {
-      const data = await getFechasDisponibles(publicToken);
+      const data = await getFechasDisponibles(publicToken, state.servicioSeleccionado?.id);
       const fechas = Array.isArray(data?.fechas) ? data.fechas : [];
-      const fechasConHorarios = await filterDatesWithAvailability({ fechas, publicToken });
+      const fechasConHorarios = await filterDatesWithAvailability({ fechas, publicToken, servicioId: state.servicioSeleccionado?.id });
 
       setState((current) => ({
         ...current,
@@ -159,7 +163,7 @@ export default function TrimlyBooking() {
       }));
 
       if (data?.exists) {
-        await loadDates();
+        setStep('service');
       } else {
         setStep('register');
       }
@@ -194,7 +198,7 @@ export default function TrimlyBooking() {
         email,
         bookingSession: data?.booking_session || current.bookingSession,
       }));
-      await loadDates();
+      setStep('service');
     } catch {
       setError(friendlyErrors.register);
     } finally {
@@ -214,7 +218,7 @@ export default function TrimlyBooking() {
     setError('');
 
     try {
-      const data = await getDisponibilidad({ fecha, publicToken });
+      const data = await getDisponibilidad({ fecha, publicToken, servicioId: state.servicioSeleccionado?.id });
       const horas = Array.isArray(data?.horas) ? data.horas : [];
 
       if (!horas.length) {
@@ -243,6 +247,11 @@ export default function TrimlyBooking() {
     }
   }
 
+  async function handleSelectService() {
+    if (!state.servicioSeleccionado) return;
+    await loadDates();
+  }
+
   async function handlePreconfirm() {
     if (!state.horaSeleccionada || loading) return;
 
@@ -255,6 +264,7 @@ export default function TrimlyBooking() {
         fecha: state.fechaSeleccionada,
         hora: normalizeTimeForApi(state.horaSeleccionada),
         publicToken,
+        servicioId: state.servicioSeleccionado?.id,
       });
 
       setState((current) => ({
@@ -283,6 +293,7 @@ export default function TrimlyBooking() {
         fecha: state.fechaSeleccionada,
         hora: normalizeTimeForApi(state.horaSeleccionada),
         publicToken,
+        servicioId: state.servicioSeleccionado?.id,
       });
 
       setState((current) => ({
@@ -302,6 +313,7 @@ export default function TrimlyBooking() {
       ...initialBooking,
       empresa: current.empresa,
       barbero: current.barbero,
+      servicios: current.servicios,
       activo: current.activo,
     }));
     setError('');
@@ -361,12 +373,24 @@ export default function TrimlyBooking() {
         />
       ) : null}
 
+      {step === 'service' ? (
+        <ServiceStep
+          services={state.servicios}
+          selectedService={state.servicioSeleccionado}
+          onSelect={(service) => setState((current) => ({ ...current, servicioSeleccionado: service }))}
+          onContinue={handleSelectService}
+          onBack={() => setStep('phone')}
+          loading={loading}
+          error={error}
+        />
+      ) : null}
+
       {step === 'calendar' ? (
         <CalendarStep
           fechas={state.fechasDisponibles}
           selectedDate={state.fechaSeleccionada}
           onSelectDate={handleSelectDate}
-          onBack={() => setStep('phone')}
+          onBack={() => setStep('service')}
           loading={loading}
           error={error}
         />
@@ -392,6 +416,7 @@ export default function TrimlyBooking() {
           fecha={state.fechaSeleccionada}
           hora={state.horaSeleccionada}
           preconfirmacion={state.preconfirmacion}
+          servicio={state.servicioSeleccionado}
           onConfirm={handleConfirm}
           onChangeTime={() => setStep('times')}
           onBack={() => setStep('times')}

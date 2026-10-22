@@ -89,15 +89,17 @@ export function registrarCliente({ bookingSession, nombre, telefono, email, publ
   });
 }
 
-export function getFechasDisponibles(publicToken) {
-  return request(withPublicToken('/fechas-disponibles', publicToken));
+export function getFechasDisponibles(publicToken, servicioId) {
+  const path = servicioId ? `/fechas-disponibles?servicio_id=${encodeURIComponent(servicioId)}` : '/fechas-disponibles';
+  return request(withPublicToken(path, publicToken));
 }
 
-export function getDisponibilidad({ fecha, publicToken }) {
-  return request(withPublicToken(`/disponibilidad?fecha=${encodeURIComponent(fecha)}`, publicToken));
+export function getDisponibilidad({ fecha, publicToken, servicioId }) {
+  const serviceQuery = servicioId ? `&servicio_id=${encodeURIComponent(servicioId)}` : '';
+  return request(withPublicToken(`/disponibilidad?fecha=${encodeURIComponent(fecha)}${serviceQuery}`, publicToken));
 }
 
-export function preconfirmarCita({ bookingSession, fecha, hora, publicToken }) {
+export function preconfirmarCita({ bookingSession, fecha, hora, publicToken, servicioId }) {
   return request('/citas/preconfirmar', {
     method: 'POST',
     body: JSON.stringify({
@@ -105,11 +107,12 @@ export function preconfirmarCita({ bookingSession, fecha, hora, publicToken }) {
       fecha,
       hora,
       public_token: publicToken,
+      servicio_id: servicioId,
     }),
   });
 }
 
-export function confirmarCita({ bookingSession, fecha, hora, publicToken }) {
+export function confirmarCita({ bookingSession, fecha, hora, publicToken, servicioId }) {
   return request('/citas/confirmar', {
     method: 'POST',
     body: JSON.stringify({
@@ -117,6 +120,7 @@ export function confirmarCita({ bookingSession, fecha, hora, publicToken }) {
       fecha,
       hora,
       public_token: publicToken,
+      servicio_id: servicioId,
     }),
   });
 }

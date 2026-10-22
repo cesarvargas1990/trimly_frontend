@@ -30,7 +30,7 @@ export default function PhoneStep({ onSubmit, onBack, loading, error }) {
   return (
     <form className="step-card" onSubmit={handleSubmit}>
       <StepHeader
-        step="Paso 1 de 4"
+        step="Paso 1 de 5"
         title="Tu número de teléfono"
         description="Lo usamos para buscar tus datos y confirmar tu cita."
         onBack={onBack}

@@ -42,7 +42,7 @@ export default function CalendarStep({ fechas, selectedDate, onSelectDate, onBac
   return (
     <div className="step-card calendar-card">
       <StepHeader
-        step="Paso 2 de 4"
+        step="Paso 3 de 5"
         title="Elige el día"
         description="Selecciona la fecha de tu cita."
         onBack={onBack}

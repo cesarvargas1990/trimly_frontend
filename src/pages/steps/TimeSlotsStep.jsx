@@ -17,7 +17,7 @@ export default function TimeSlotsStep({
   return (
     <div className="step-card time-slots-card">
       <StepHeader
-        step="Paso 3 de 4"
+        step="Paso 4 de 5"
         title="Horarios disponibles"
         description={formatLongDate(fecha)}
         onBack={onBack}

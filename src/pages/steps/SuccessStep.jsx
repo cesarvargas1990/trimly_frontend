@@ -59,6 +59,8 @@ export default function SuccessStep({ citaConfirmada, empresa, barbero, onRestar
         <SummaryItem icon={UserRound} label="Cliente" value={cita.cliente} />
         <SummaryItem icon={Phone} label="Teléfono" value={cita.telefono} />
         <SummaryItem icon={Scissors} label="Barbero" value={cita.barbero} />
+        <SummaryItem icon={Scissors} label="Servicio" value={cita.servicio} />
+        <SummaryItem icon={Scissors} label="Valor" value={cita.precio_cop ? formatMoney(cita.precio_cop) : null} />
         <SummaryItem icon={CalendarDays} label="Fecha" value={formatDate(cita.fecha)} />
         <SummaryItem icon={Clock} label="Hora" value={cita.hora} />
       </div>
@@ -133,6 +135,10 @@ function SummaryItem({ icon: Icon, label, value }) {
 function formatDate(dateKey) {
   if (!dateKey) return '';
   return /^\d{4}-\d{2}-\d{2}$/.test(dateKey) ? formatLongDate(dateKey) : dateKey;
+}
+
+function formatMoney(value) {
+  return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(value || 0));
 }
 
 function buildCalendarFile({ cita, codigo, empresa, barbero }) {
