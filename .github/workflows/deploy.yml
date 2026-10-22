@@ -36,6 +36,16 @@ jobs:
             fi
 
             cd "$DEPLOY_PATH"
-            git pull --ff-only origin main
+            git fetch origin main
+
+            # El servidor conserva ajustes locales de infraestructura en estos
+            # dos archivos. Actualizar solo los archivos de aplicación evita
+            # sobrescribirlos durante el despliegue.
+            git diff --name-only HEAD origin/main | while IFS= read -r file; do
+              case "$file" in
+                docker-compose.yml|nginx.conf) ;;
+                *) git checkout origin/main -- "$file" ;;
+              esac
+            done
 
             VITE_API_BASE_URL="$API_BASE_URL" docker compose up --build -d --remove-orphans
