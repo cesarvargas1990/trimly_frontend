@@ -1,4 +1,4 @@
-import { Scissors } from 'lucide-react';
+import { Brush, Scissors, UserRound } from 'lucide-react';
 import AlertMessage from '../../components/AlertMessage.jsx';
 import PrimaryButton from '../../components/PrimaryButton.jsx';
 import StepHeader from '../../components/StepHeader.jsx';
@@ -11,7 +11,7 @@ export default function ServiceStep({ services, selectedService, onSelect, onCon
       <div className="service-list">
         {services.map((service) => (
           <button key={service.id} type="button" aria-pressed={selectedService?.id === service.id} className={`service-option ${selectedService?.id === service.id ? 'selected' : ''}`} onClick={() => onSelect(service)} disabled={loading}>
-            <span className="service-icon"><Scissors size={20} /></span>
+            <span className="service-icon"><ServiceIcon icon={service.icono} /></span>
             <span className="service-copy"><strong>{service.nombre}</strong></span>
           </button>
         ))}
@@ -20,4 +20,10 @@ export default function ServiceStep({ services, selectedService, onSelect, onCon
       <PrimaryButton disabled={!selectedService || loading} loading={loading} onClick={onContinue}>Continuar</PrimaryButton>
     </div>
   );
+}
+
+function ServiceIcon({ icon }) {
+  const Icon = icon === 'brush' ? Brush : icon === 'user-round' ? UserRound : Scissors;
+
+  return <Icon size={20} aria-hidden="true" />;
 }
