@@ -30,7 +30,6 @@ export default function PreConfirmStep({
         <SummaryItem icon={Scissors} label="Barbería" value={empresa?.nombre || 'Barbería'} />
         <SummaryItem icon={UserRound} label="Barbero" value={barbero?.nombre || 'Asignado'} />
         <SummaryItem icon={Scissors} label="Servicio" value={servicio?.nombre} />
-        <SummaryItem icon={Scissors} label="Valor" value={servicio ? formatMoney(servicio.precio_cop) : null} />
         <SummaryItem icon={CalendarDays} label="Fecha" value={formatLongDate(fecha)} />
         <SummaryItem icon={Clock} label="Hora" value={hora?.label} />
       </div>
@@ -42,10 +41,6 @@ export default function PreConfirmStep({
       </PrimaryButton>
     </div>
   );
-}
-
-function formatMoney(value) {
-  return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(value || 0));
 }
 
 function SummaryItem({ icon: Icon, label, value }) {

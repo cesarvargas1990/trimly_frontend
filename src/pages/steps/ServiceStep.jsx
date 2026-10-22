@@ -1,9 +1,7 @@
-import { Clock, Scissors } from 'lucide-react';
+import { Scissors } from 'lucide-react';
 import AlertMessage from '../../components/AlertMessage.jsx';
 import PrimaryButton from '../../components/PrimaryButton.jsx';
 import StepHeader from '../../components/StepHeader.jsx';
-
-const money = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
 
 export default function ServiceStep({ services, selectedService, onSelect, onContinue, onBack, loading, error }) {
   return (
@@ -12,10 +10,9 @@ export default function ServiceStep({ services, selectedService, onSelect, onCon
       <AlertMessage type="error" message={error} />
       <div className="service-list">
         {services.map((service) => (
-          <button key={service.id} type="button" className={`service-option ${selectedService?.id === service.id ? 'selected' : ''}`} onClick={() => onSelect(service)} disabled={loading}>
+          <button key={service.id} type="button" aria-pressed={selectedService?.id === service.id} className={`service-option ${selectedService?.id === service.id ? 'selected' : ''}`} onClick={() => onSelect(service)} disabled={loading}>
             <span className="service-icon"><Scissors size={20} /></span>
-            <span className="service-copy"><strong>{service.nombre}</strong><small><Clock size={14} /> {service.duracion_minutos} minutos</small></span>
-            <strong>{money.format(Number(service.precio_cop || 0))}</strong>
+            <span className="service-copy"><strong>{service.nombre}</strong></span>
           </button>
         ))}
       </div>
